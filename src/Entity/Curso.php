@@ -17,7 +17,7 @@ class Curso
     /**
      * @Column(type="string")
      */
-    private $descricao;
+    private string $descricao;
 
     public function getId(): int
     {
