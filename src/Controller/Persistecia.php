@@ -4,40 +4,47 @@ namespace Alura\Cursos\Controller;
 
 use Alura\Cursos\Entity\Curso;
 use Alura\Cursos\Helper\FlashMessageTrait;
-use Alura\Cursos\Infra\EntityManagerCreator;
 use Doctrine\ORM\EntityManagerInterface;
+use Nyholm\Psr7\Response;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 
-class Persistecia implements InterfaceControladorRequisicao
+class Persistecia implements RequestHandlerInterface
 {
     use FlashMessageTrait;
 
     private EntityManagerInterface $entityManager;
 
-    public function __construct()
+    public function __construct(EntityManagerInterface $entityManager)
     {
-        $this->entityManager = (new EntityManagerCreator())
-            ->getEntityManager();
+        $this->entityManager = $entityManager;
     }
 
-    public function processaRequisicao(): void
+    public function handle(ServerRequestInterface $request): ResponseInterface
     {
-
-        $descricao = filter_input(
-            INPUT_POST,
-            'descricao',
+        $parsedBody = $request->getParsedBody();
+        $descricao = filter_var(
+            $parsedBody['descricao'],
             FILTER_SANITIZE_STRING
         );
 
         $curso = new Curso();
         $curso->setDescricao($descricao);
 
-        $id = filter_input(
-            INPUT_GET,
-            'id',
-            FILTER_VALIDATE_INT
-        );
+        $queryString = $request->getQueryParams();
 
-        if (!is_null($id) && $id !== false) {
+        if (isset($queryString['id'])){
+            $id = filter_var(
+                $queryString['id'],
+                FILTER_VALIDATE_INT
+            );
+        } else {
+            $id = null;
+        }
+
+
+        if (!is_null($id) && $id !== false) {               // para alterar curso
             $curso->setId($id);
             $this->entityManager->merge($curso);
             $this->defineMensagem('success', 'Curso atualizado com sucesso');
@@ -48,7 +55,9 @@ class Persistecia implements InterfaceControladorRequisicao
 
         $this->entityManager->flush();
 
-        header('Location: /listar-cursos', true, 302);
+        return new Response(302, ['Location' => '/listar-cursos']);
+
     }
 
 }
+
