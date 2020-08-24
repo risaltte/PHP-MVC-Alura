@@ -1,7 +1,7 @@
 <?php
 
-use Alura\Cursos\Controller\{
-    CursosEmJson,
+use Alura\Cursos\Controller\{CursosEmJson,
+    CursosEmXml,
     Deslogar,
     Exclusao,
     FormularioEdicao,
@@ -9,8 +9,7 @@ use Alura\Cursos\Controller\{
     FormularioLogin,
     ListarCursos,
     Persistecia,
-    RealizarLogin
-};
+    RealizarLogin};
 
 return $rotas = [
     '/listar-cursos' => ListarCursos::class,
@@ -22,5 +21,6 @@ return $rotas = [
     '/realiza-login' => RealizarLogin::class,
     '/logout' => Deslogar::class,
     '/buscarCursosEmJson' => CursosEmJson::class,
+    '/buscarCursosEmXml' => CursosEmXml::class,
 ];
 
